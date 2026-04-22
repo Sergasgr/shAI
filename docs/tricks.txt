@@ -1,0 +1,5 @@
+"To restart de server of the office use the command: sudo systemctl restart server-oficina-shai"
+"To clean my download's personal cache use: rm -rf ~/.cache/mis_descargas/*"
+
+
+
