@@ -1,5 +1,11 @@
-"To restart de server of the office use the command: sudo systemctl restart server-oficina-shai"
-"To clean my download's personal cache use: rm -rf ~/.cache/mis_descargas/*"
+Para reiniciar el servidor principal de la oficina de desarrollo usa el siguiente comando:
+sudo systemctl restart servidor-oficina-shai
 
+Si necesito limpiar mi caché personal de descargas temporales del proyecto, el comando es:
+rm -rf ~/.cache/mis_descargas_temporales/*
 
+Para borrar todos los contenedores de Docker que estén detenidos en mi máquina de golpe:
+docker rm -f $(docker ps -aq)
 
+El atajo para actualizar la base de datos de mis clientes en el entorno de pruebas local es:
+psql -U admin -d db_pruebas -c "REFRESH MATERIALIZED VIEW clientes_activos;"

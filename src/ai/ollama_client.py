@@ -24,7 +24,6 @@ def get_command(user_input: str, context: dict) -> str:
     data = response.json()
     return data["response"].replace("```bash", "").replace("```", "").replace("`", "").strip().split("\n")[0]
     
-    
 def get_explanation(command: str, context: dict) -> str:
     instructions = f"You are a Linux Shell expert. Return a briefly explanation of the command {command} in the language {context['language']}. Be concise and direct."
     req = {
@@ -35,3 +34,16 @@ def get_explanation(command: str, context: dict) -> str:
     response = httpx.post(OLLAMA_BASE_URL+"api/generate", json=req)
     data = response.json()
     return data["response"].replace("`","'")
+
+def get_bash_script(user_input: str, context: dict) -> str:
+    rag_context = search_knowledge(user_input)
+    instructions = f"Role: You are a Linux Shell expert. Context: OS: {context['os']}, Shell: {context['shell']}. Documentation: {rag_context}. Constraint: Return ONLY the raw bash code. DO NOT include any greetings, explanations, or conversational text before or after the code. DO NOT use markdown formatting like ```bash. The output MUST start exactly with #!/bin/bash. Ensure strict adherence to the provided documentation over general knowledge."
+    req = {
+        "model": OLLAMA_MODEL,
+        "prompt": user_input,
+        "system": instructions,
+        "stream": False
+    }
+    response = httpx.post(OLLAMA_BASE_URL+"api/generate", json=req)
+    data = response.json()
+    return data["response"].replace("```bash", "").replace("```", "").strip()

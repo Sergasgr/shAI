@@ -14,7 +14,3 @@ def get_system_context() -> dict:
         os_ = 'Linux/Unix'
         
     return {'os': os_, 'shell': shell, 'language': lang}          
-                
-    
-    
-    

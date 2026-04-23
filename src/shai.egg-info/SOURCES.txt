@@ -7,5 +7,10 @@ src/shai/cli.py
 src/shai.egg-info/PKG-INFO
 src/shai.egg-info/SOURCES.txt
 src/shai.egg-info/dependency_links.txt
+src/shai.egg-info/entry_points.txt
 src/shai.egg-info/requires.txt
 src/shai.egg-info/top_level.txt
+src/shai/core/__init__.py
+src/shai/core/config.py
+src/shai/core/env_detector.py
+src/shai/core/rag_engine.py
