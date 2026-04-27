@@ -27,5 +27,3 @@ try:
         print(f"Precision: {(hits / n_examples) * 100:.2f}%. Average latency: {(total_latency / n_examples) * 1000:.2f}ms")
 except FileNotFoundError:
     print("'ground_truth.json' not found")
-
-
