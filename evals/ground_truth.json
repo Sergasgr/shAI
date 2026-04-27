@@ -1,0 +1,82 @@
+[
+  {
+    "prompt": "list all files including hidden ones with details",
+    "expected": "ls -la"
+  },
+  {
+    "prompt": "find files modified in the last 7 days in current directory",
+    "expected": "find . -mtime -7"
+  },
+  {
+    "prompt": "extract a compressed tar.gz archive",
+    "expected": "tar -xzf archive.tar.gz"
+  },
+  {
+    "prompt": "show free disk space in human readable format",
+    "expected": "df -h"
+  },
+  {
+    "prompt": "display available RAM memory in human readable format",
+    "expected": "free -h"
+  },
+  {
+    "prompt": "search for the word error inside application.log",
+    "expected": "grep \"error\" application.log"
+  },
+  {
+    "prompt": "change file permissions of script.sh to be executable by everyone",
+    "expected": "chmod 755 script.sh"
+  },
+  {
+    "prompt": "change the owner of config.txt to root user",
+    "expected": "sudo chown root config.txt"
+  },
+  {
+    "prompt": "download a file from the internet using curl and save it with its original name",
+    "expected": "curl -O https://example.com/file.zip"
+  },
+  {
+    "prompt": "kill a process by its exact name nginx",
+    "expected": "pkill nginx"
+  },
+  {
+    "prompt": "show the last 100 lines of the syslog file",
+    "expected": "tail -n 100 /var/log/syslog"
+  },
+  {
+    "prompt": "compress a folder named data into a zip file named backup.zip",
+    "expected": "zip -r backup.zip data/"
+  },
+  {
+    "prompt": "copy a directory named src to dest recursively",
+    "expected": "cp -r src/ dest/"
+  },
+  {
+    "prompt": "rename a file from old.txt to new.txt",
+    "expected": "mv old.txt new.txt"
+  },
+  {
+    "prompt": "forcefully remove a directory named build and all its contents",
+    "expected": "rm -rf build/"
+  },
+  {
+    "prompt": "create an empty file named output.txt",
+    "expected": "touch output.txt"
+  },
+  {
+    "prompt": "create a directory structure project/src/main creating parent directories if needed",
+    "expected": "mkdir -p project/src/main"
+  },
+  {
+    "prompt": "print the current working directory path",
+    "expected": "pwd"
+  },
+  {
+    "prompt": "clear the terminal screen",
+    "expected": "clear"
+  },
+  {
+    "prompt": "display all network interfaces and IP addresses",
+    "expected": "ip a"
+  }
+]

@@ -19,6 +19,7 @@ from typing import Annotated
 from ai.ollama_client import check_llm, get_command, get_explanation, get_bash_script
 from shai.core.env_detector import get_system_context
 from shai.core.rag_engine import build_vector_db
+from shai.core.telemetry import init_db, log_execution
 
 t = typer.Typer() 
 console = Console()
@@ -77,6 +78,7 @@ def ask(
     """
     
     final_output = ""
+    expl_text = "NULL"
     #REVISAR LAS POSIBILIDADES DE COMBINACIONES POSIBLES DE COMANDOS
     
     if not check_llm():
@@ -112,10 +114,10 @@ def ask(
     
     if explanation:
         with console.status("Generating explanation...", spinner='material'):
-            expl = get_explanation(command, sys_context)  
+            expl_text = get_explanation(command, sys_context)  
       
-        final_output += f"\n# Explanation: {expl}"
-        print(Panel.fit(Markdown(expl), border_style="cyan", title="Explanation"))
+        final_output += f"\n# Explanation: {expl_text}"
+        print(Panel.fit(Markdown(expl_text), border_style="cyan", title="Explanation"))
         
     if save:
         save_to_file(final_output, save, 'w' if not append else 'a') 
@@ -128,7 +130,8 @@ def ask(
         if not ex:
             raise typer.Exit(code=1)
 
-    subprocess.run(command, shell=True)
+    result = subprocess.run(command, shell=True)
+    log_execution(prompt, command, expl_text, sys_context['os'], result.returncode)
    
 @t.command()
 def learn(file_path: str):
@@ -152,4 +155,5 @@ def setup():
 """    
     
 if __name__ == "__main__":
+    init_db()
     t()
