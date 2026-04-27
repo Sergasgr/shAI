@@ -1,5 +1,6 @@
 import json
 import time
+import os
 from ai.ollama_client import get_command
 
 mock_context = {
@@ -8,19 +9,23 @@ mock_context = {
     "language": "en_US.UTF-8" 
 }
 
-avg_time = 0
-hit = 0
-n_examples = 0
+total_latency = 0
+hits = 0
+path = os.path.expanduser("~/shai/evals/ground_truth.json")
 
-with open('/home/sergas/shai/evals/ground_truth.json', 'r') as f:
-    data = json.load(f)
-    n_examples = len(data)
-    for example in data:
-        t1 = time.time()
-        y_hat = get_command(example['prompt'], mock_context)
-        t2 = time.time()
-        avg_time += t2 - t1
-        if y_hat == example['expected']:
-            hit += 1
+try:
+    with open(path, 'r') as f:
+        data = json.load(f)
+        n_examples = len(data)
+        for example in data:
+            start = time.time()
+            y_hat = get_command(example['prompt'], mock_context)
+            end = time.time()
+            total_latency += (end - start)
+            if y_hat == example['expected'].strip():
+                hits += 1
+        print(f"Precision: {(hits / n_examples) * 100:.2f}%. Average latency: {(total_latency / n_examples) * 1000:.2f}ms")
+except FileNotFoundError:
+    print("'ground_truth.json' not found")
 
-print(f"Precision: {hit/n_examples*100:.2f}%. Average latency: {avg_time/n_examples*1000:.2f}ms")
+
