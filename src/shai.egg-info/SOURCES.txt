@@ -1,7 +1,5 @@
 README.md
 pyproject.toml
-src/ai/__init__.py
-src/ai/ollama_client.py
 src/shai/__init__.py
 src/shai/cli.py
 src/shai.egg-info/PKG-INFO
@@ -10,7 +8,10 @@ src/shai.egg-info/dependency_links.txt
 src/shai.egg-info/entry_points.txt
 src/shai.egg-info/requires.txt
 src/shai.egg-info/top_level.txt
+src/shai/ai/__init__.py
+src/shai/ai/ollama_client.py
 src/shai/core/__init__.py
 src/shai/core/config.py
 src/shai/core/env_detector.py
 src/shai/core/rag_engine.py
+src/shai/core/telemetry.py

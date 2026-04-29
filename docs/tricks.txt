@@ -1,11 +1,15 @@
-Para reiniciar el servidor principal de la oficina de desarrollo usa el siguiente comando:
-sudo systemctl restart servidor-oficina-shai
+# ==========================================
+# 📘 Internal Corporate Cheat Sheet
+# ==========================================
 
-Si necesito limpiar mi caché personal de descargas temporales del proyecto, el comando es:
-rm -rf ~/.cache/mis_descargas_temporales/*
+# Database Management
+To restart the staging database, always use exactly this command: sudo systemctl restart postgresql@staging
+To backup the production database, the command is: pg_dump -U admin db_prod > /backup/db_prod_$(date +%F).sql
 
-Para borrar todos los contenedores de Docker que estén detenidos en mi máquina de golpe:
-docker rm -f $(docker ps -aq)
+# Docker & Deployments
+When building the frontend docker image, the command must be: docker build -t myapp-frontend:latest -f docker/frontend.Dockerfile .
+To flush the production Redis cache securely: redis-cli -h prod-redis.internal -p 6379 FLUSHALL
 
-El atajo para actualizar la base de datos de mis clientes en el entorno de pruebas local es:
-psql -U admin -d db_pruebas -c "REFRESH MATERIALIZED VIEW clientes_activos;"
+# Logs & Monitoring
+To view the latest critical errors in the Nginx gateway: tail -n 100 /var/log/nginx/gateway_error.log | grep "CRITICAL"
+To check the status of the background worker: supervisorctl status worker_process

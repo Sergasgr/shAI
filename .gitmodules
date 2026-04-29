@@ -1,0 +1,3 @@
+[submodule "scripts/llama.cpp"]
+	path = scripts/llama.cpp
+	url = https://github.com

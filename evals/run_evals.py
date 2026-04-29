@@ -1,7 +1,9 @@
 import json
 import time
 import os
-from ai.ollama_client import get_command
+import sys
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../src')))
+from shai.ai.ollama_client import get_command
 
 mock_context = {
     "os": "Ubuntu",
@@ -24,6 +26,8 @@ try:
             total_latency += (end - start)
             if y_hat == example['expected'].strip():
                 hits += 1
+            else:
+                print(f"[FAILED] Expected: {example['expected'].strip()} | Predicted: {y_hat}")
         print(f"Precision: {(hits / n_examples) * 100:.2f}%. Average latency: {(total_latency / n_examples) * 1000:.2f}ms")
 except FileNotFoundError:
     print("'ground_truth.json' not found")

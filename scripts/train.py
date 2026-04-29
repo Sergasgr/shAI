@@ -2,7 +2,7 @@ import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig, TrainingArguments
 from datasets import load_dataset
 from trl import SFTTrainer
-from peft import LoraModel, LoraConfig
+from peft import LoraConfig
 import os 
 
 dataset_path = os.path.expanduser("~/shai/data/dataset.jsonl")

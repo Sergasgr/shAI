@@ -78,5 +78,85 @@
   {
     "prompt": "display all network interfaces and IP addresses",
     "expected": "ip a"
+  },
+  {
+    "prompt": "list all running processes with their full command lines",
+    "expected": "ps aux"
+  },
+  {
+    "prompt": "search for files larger than 100MB in /home directory",
+    "expected": "find /home -type f -size +100M"
+  },
+  {
+    "prompt": "count the number of lines in a file named access.log",
+    "expected": "wc -l access.log"
+  },
+  {
+    "prompt": "show only the lines of a file that do not contain the word debug",
+    "expected": "grep -v \"debug\" file.log"
+  },
+  {
+    "prompt": "recursively search for the string 'API_KEY' in all files within the current folder",
+    "expected": "grep -r \"API_KEY\" ."
+  },
+  {
+    "prompt": "display the first 20 lines of a file named data.txt",
+    "expected": "head -n 20 data.txt"
+  },
+  {
+    "prompt": "check the status of the ssh service",
+    "expected": "systemctl status ssh"
+  },
+  {
+    "prompt": "restart the nginx web server",
+    "expected": "sudo systemctl restart nginx"
+  },
+  {
+    "prompt": "show current logged in users",
+    "expected": "who"
+  },
+  {
+    "prompt": "monitor system resources and processes in real-time",
+    "expected": "top"
+  },
+  {
+    "prompt": "compare two files file1.txt and file2.txt and show differences",
+    "expected": "diff file1.txt file2.txt"
+  },
+  {
+    "prompt": "create a symbolic link named link_to_file pointing to target_file",
+    "expected": "ln -s target_file link_to_file"
+  },
+  {
+    "prompt": "find the path to the executable of the command python3",
+    "expected": "which python3"
+  },
+  {
+    "prompt": "display the history of recently used commands",
+    "expected": "history"
+  },
+  {
+    "prompt": "append the text 'end of file' to the end of notes.txt",
+    "expected": "echo \"end of file\" >> notes.txt"
+  },
+  {
+    "prompt": "sort the lines of a file named names.txt alphabetically",
+    "expected": "sort names.txt"
+  },
+  {
+    "prompt": "remove duplicate lines from a sorted file names.txt",
+    "expected": "uniq names.txt"
+  },
+  {
+    "prompt": "show current system date and time",
+    "expected": "date"
+  },
+  {
+    "prompt": "change your current password",
+    "expected": "passwd"
+  },
+  {
+    "prompt": "reboot the system immediately",
+    "expected": "sudo reboot"
   }
 ]

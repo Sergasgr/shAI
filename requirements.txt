@@ -1,0 +1,34 @@
+# --- Core CLI & UI ---
+typer[all]>=0.12.0
+rich>=13.0.0
+shellingham>=1.5.4
+
+# --- API & LLM Orchestration ---
+httpx>=0.27.0
+ollama>=0.1.0
+langchain>=0.1.0
+langchain-community>=0.0.30
+langchain-text-splitters
+langchain-ollama
+
+# --- RAG & Vector Database ---
+chromadb>=0.4.24
+langchain-chroma
+sentence-transformers>=2.6.0
+
+# --- MLOps & Data Processing ---
+pandas>=2.2.0
+tqdm>=4.66.0
+# sqlite3-api>=2.0.1 (Nota: sqlite3 es nativo en Python, incluir solo si usas el wrapper específico)
+
+# --- Fine-Tuning & Training (MLOps Pipeline) ---
+torch>=2.2.0
+transformers>=4.40.0
+peft>=0.10.0
+trl>=0.8.6
+accelerate>=0.29.0
+datasets>=2.18.0
+bitsandbytes>=0.43.0
+
+# --- Environment & Utils ---
+python-dotenv>=1.0.1
