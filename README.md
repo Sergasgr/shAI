@@ -11,7 +11,7 @@
 
 ## 🎥 Demo
 
-![shAI Demo](render1777482232590.gif)
+![shAI Demo](docs/render1777482232590.gif)
 
 ---
 
