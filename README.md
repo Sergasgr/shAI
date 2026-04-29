@@ -41,7 +41,7 @@ We use `uv` for lightning-fast, isolated installation.
 
 ```bash
 # 1. Clone the repository
-git clone https://github.com/[YourUser]/shai.git
+git clone https://github.com/Sergasgr/shai.git
 cd shai
 
 # 2. Install globally using uv
