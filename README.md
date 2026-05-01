@@ -41,14 +41,20 @@ This project is not just a wrapper; it includes a full Machine Learning lifecycl
 ## 🚀 Installation & Setup
 
 ### 📋 Prerequisites
-Before installing shAI, you **must** have [Ollama](https://ollama.com/) installed on your system and at least one text-generation model downloaded:
+Before installing **shAI**, you need to have two main components in your system: **Ollama** (to run the AI models locally) and **uv** (for lightning-fast Python packaging).
+
+**1. Install Ollama & download the base model:**
 
 ```bash
 curl -fsSL https://ollama.com/install.sh | sh
 ollama pull qwen2.5-coder
 ```
 
-We use `uv` for lightning-fast, isolated installation.
+**2. Install `uv` (Python Package Manager):**
+
+```bash
+curl -LsSf https://astral.sh/uv/install.sh | sh
+```
 
 ```bash
 # 1. Clone the repository
@@ -98,18 +104,47 @@ shai learn doc.txt
 ```
 
 ### 3. `shai setup` (Environment Initialization)
-Initializes the local SQLite telemetry database, verifies the Ollama installation, and pulls the required nomic-embed-text embedding models for the RAG engine.
+Initializes the local SQLite telemetry database, verifies the Ollama installation, and pulls the required `nomic-embed-text` embedding models for the RAG engine. By default, it intelligently scans your installed Ollama models, prioritizing your fine-tuned `shai-expert` if it exists, or defaulting to the base `qwen2.5-coder`.
 
 ```bash
 shai setup
 ```
 
-### 4. `shai train` (Dataset Export)
-Analyzes your local telemetry database (feedback.db). It extracts your successful command executions (exit code 0) and explanations, crossing them with a ground_truth.json file to generate a high-quality, ChatML-formatted dataset (dataset.jsonl). This is the first step to fine-tune your own shai-expert model.
+**Flags & Options:**
+* `--model` / `-m`: Override the default auto-detection and specify exactly which model to use. Extremely useful when you want to switch to your custom fine-tuned model for the first time (e.g., shai setup -m shai-expert).
+
+### 4. `shai train` (Continuous Learning & Fine-Tuning)
+The true power of shAI lies in its End-to-End MLOps pipeline. The tool continuously logs your successful executions and their explanations into a local SQLite database (`feedback.db`). 
+
+When you have accumulated enough data you can run: 
 
 ```bash
 shai train
 ```
+
+This command triggers the automated data pipeline:
+
+1. **Extraction & Formatting**: Extracts your local telemetry and crosses it with a `ground_truth.json` file to generate a high-quality, ChatML-formatted dataset (`dataset.jsonl`).
+2. **LoRA Fine-Tuning**: Use the provided python scripts (`scripts/train.py`) to train a parameter-efficient adapter using PyTorch and HuggingFace's peft.
+3. **Merging & Conversion**: Merge the adapter with the base model (`scripts/merge.py`) and convert it to a .gguf format (`shai-bash-v1.gguf`) using llama.cpp.
+
+#### 🐳 Deploying your custom model
+You don't need to configure the model manually. The repository already includes a pre-configured Modelfile in the root directory. It contains the optimized system prompt, the strict ChatML template, and automatically points to your generated shai-bash-v1.gguf file.
+
+To build your expert model in Ollama, simply run:
+
+```bash
+ollama create shai-expert -f Modelfile
+```
+
+#### 🔄 Switching Engines
+Now that your custom model is installed, tell shAI to use it as the main engine:
+
+```bash
+shai setup --model shai-expert
+```
+
+(Note: From now on, if you ever run a plain shai setup again, the system will automatically detect shai-expert and prioritize it over the default base model).
 
 ---
 
@@ -122,3 +157,7 @@ shai train
 ### 👨‍💻 About the Author
 
 **Sergio Graciá, Sergas.** *LinkedIn:* [https://www.linkedin.com/in/sergio-gracia-](https://www.linkedin.com/in/sergio-gracia-)
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.

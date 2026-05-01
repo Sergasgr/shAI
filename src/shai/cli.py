@@ -179,7 +179,7 @@ def learn(file_path: str):
     print("[green]The content has been learnt succesfully")
 
 @t.command()
-def setup(model: str = typer.Option("-m", help="Specify the model to use")):
+def setup(model: Annotated[str | None, typer.Option("--model", "-m", help="Specify the model to use")] = None):
     """
     [bold cyan]Initialize[/bold cyan] the shAI environment.
     
@@ -210,9 +210,15 @@ def setup(model: str = typer.Option("-m", help="Specify the model to use")):
             raise typer.Exit(code=1)
         selected_model = matching_models[0]
     else:
-        matching_defaults = [m for m in valid_models if "qwen2.5-coder" in m]
-        selected_model = matching_defaults[0] if matching_defaults else valid_models[0]
-        
+        expert_models = [m for m in valid_models if "shai-expert" in m]
+        qwen_models = [m for m in valid_models if "qwen2.5-coder" in m]
+        if expert_models:
+            selected_model = expert_models[0]
+        elif qwen_models:
+            selected_model = qwen_models[0]
+        else:
+            selected_model = valid_models[0]
+    
     CONFIG_DIR = os.path.expanduser("~/.shai")
     os.makedirs(CONFIG_DIR, exist_ok=True)
     with open(os.path.join(CONFIG_DIR, 'config.json'), 'w', encoding='utf-8') as f:
