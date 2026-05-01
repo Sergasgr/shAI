@@ -10,16 +10,19 @@ dist/
 uv.lock
 
 # === Machine Learning Models (Heavy Files) ===
-models/*.gguf
-scripts/models/checkpoints/
-scripts/models/shai-bash-adapter/
-scripts/models/shai-merged/
+models/
+scripts/models/
+checkpoints/
+*.safetensors
+*.gguf
+*.bin
 
 # === Local Data & Databases (Private/Large) ===
-data/feedback.db
-data/shai_db/
+data/
 shai_db/
 .chroma/
+*.sqlite
+*.db
 
 # === Testing & Logs ===
 .pytest_cache/
@@ -30,5 +33,5 @@ tests/.pytest_cache/
 .DS_Store
 Thumbs.db
 
-# Externals
+# === Externals ===
 scripts/llama.cpp/

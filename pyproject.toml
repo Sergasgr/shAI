@@ -1,6 +1,6 @@
 [project]
 name = "shai"
-version = "1.1.1"
+version = "1.1.2"
 description = "AI-powered local terminal assistant with RAG memory and End-to-End MLOps pipeline."
 readme = "README.md"
 requires-python = ">=3.12"
