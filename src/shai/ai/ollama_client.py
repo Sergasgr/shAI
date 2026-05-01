@@ -32,6 +32,9 @@ def get_command(user_input: str, context: dict) -> str:
     response = httpx.post(OLLAMA_BASE_URL+"api/chat", json=req, timeout=None)
     data = response.json()
     
+    if "error" in data:
+        return data['error']
+        
     data_content = data["message"]["content"].replace("```bash", "").replace("```", "").replace("`", "")
     lines = data_content.split("\n")
     
@@ -59,7 +62,7 @@ def get_explanation(command: str, context: dict) -> str:
 
 def get_bash_script(user_input: str, context: dict) -> str:
     rag_context = search_knowledge(user_input)
-    instructions = f"You are a Linux Shell expert. Return ONLY the raw bash code starting exactly with #!/bin/bash. No markdown formatting. OS: {context['os']}. Shell: {context['shell']}."
+    instructions = f"You are a strict Linux Shell executor. Return ONLY the raw bash code starting exactly with #!/bin/bash. NO explanations, NO markdown formatting, NO conversational text before or after. OS: {context['os']}. Shell: {context['shell']}."
     
     if rag_context:
         instructions += f" Strict documentation to follow: {rag_context}"
@@ -75,7 +78,23 @@ def get_bash_script(user_input: str, context: dict) -> str:
     
     response = httpx.post(OLLAMA_BASE_URL+"api/chat", json=req, timeout=None)
     data = response.json()
-    return data["message"]["content"].replace("```bash", "").replace("```", "").strip()
+    
+    if "error" in data:
+        return f"ERROR_OLLAMA_API: {data['error']}"
+    
+    content = data["message"]["content"]
+    
+    if "```bash" in content:
+        script = content.split("```bash")[1].split("```")[0].strip()
+    elif "```" in content:
+        script = content.split("```")[1].split("```")[0].strip()
+    else:
+        script = content.strip()
+        
+    if "#!/bin/bash" in script:
+        script = "#!/bin/bash" + script.split("#!/bin/bash")[1]
+    
+    return script
 
 def get_script_explanation(script: str, context: dict) -> str:
     instructions = f"You are a Linux Shell expert. Briefly explain what the provided bash script does step by step. OS: {context['os']}. Language: {context['language']}."
@@ -91,4 +110,4 @@ def get_script_explanation(script: str, context: dict) -> str:
     
     response = httpx.post(OLLAMA_BASE_URL+"api/chat", json=req, timeout=None)
     data = response.json()
-    return data["message"]["content"].replace("`","'")
+    return data["message"]["content"].replace("`","'").replace("'''", "")

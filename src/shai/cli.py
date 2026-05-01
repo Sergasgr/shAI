@@ -10,6 +10,9 @@ import typer
 import re
 import os.path
 import subprocess
+import shutil
+import json
+import sys
 from rich import print
 from rich.console import Console
 from rich.syntax import Syntax
@@ -19,7 +22,7 @@ from typing import Annotated
 from shai.ai.ollama_client import check_llm, get_command, get_explanation, get_bash_script, get_script_explanation
 from shai.core.env_detector import get_system_context
 from shai.core.rag_engine import build_vector_db
-from shai.core.telemetry import init_db, log_execution
+from shai.core.telemetry import init_db, log_execution, db_path
 
 t = typer.Typer(
     rich_markup_mode="rich",
@@ -107,6 +110,12 @@ def ask(
             print(f"[yellow]The option --alias is ignored when generating bash scripts")
         with console.status("Generating script...", spinner='dots'):
             script = get_bash_script(prompt, sys_context) 
+            
+        if script.startswith("ERROR_OLLAMA_API:"):
+            print(f"[bold red]Ollama API Error:[/bold red] {script.split(':', 1)[1].strip()}")
+            print("[yellow]Tip: Check if the configured model is installed by running 'ollama list'.[/yellow]")
+            raise typer.Exit(code=1)
+            
         syntax_block = Syntax(script, "bash", theme="ansi_dark", background_color="default", word_wrap=True)
         console.print(syntax_block)
         final_output += script 
@@ -115,7 +124,7 @@ def ask(
         
         if explanation:
             with console.status("Generating explanation...", spinner='material'):
-                script_expl = get_script_explanation(script, sys_context)  
+                script_expl = get_script_explanation(script, sys_context)
             final_output += f"\n# Explanation: {script_expl}"
             print(Panel.fit(Markdown(script_expl), border_style="cyan", title="Explanation"))
                         
@@ -124,12 +133,17 @@ def ask(
     with console.status("", spinner='dots'):
         command = get_command(prompt, sys_context)
     
+    if command.startswith("ERROR_OLLAMA_API:"):
+        print(f"[bold red]Ollama API Error:[/bold red] {command.split(':', 1)[1].strip()}")
+        print("[yellow]Tip: Check if the configured model is installed by running 'ollama list'.[/yellow]")
+        raise typer.Exit(code=1)
+    
     final_output += command
     print(Panel.fit(f"[green]{command}", border_style="green"))
     
     if explanation:
         with console.status("Generating explanation...", spinner='material'):
-            expl_text = get_explanation(command, sys_context)  
+            expl_text = get_explanation(command, sys_context)  #Aqui no haria falta el error porque ya hubiera raiseado antes no?
       
         final_output += f"\n# Explanation: {expl_text}"
         print(Panel.fit(Markdown(expl_text), border_style="cyan", title="Explanation"))
@@ -165,16 +179,48 @@ def learn(file_path: str):
     print("[green]The content has been learnt succesfully")
 
 @t.command()
-def setup():
+def setup(model: str = typer.Option("-m", help="Specify the model to use")):
     """
     [bold cyan]Initialize[/bold cyan] the shAI environment.
     
-    Creates the local database and downloads the necessary embedding models 
-    from Ollama to ensure the RAG engine works correctly.
+    Verifies Ollama installation, selects the AI engine, creates the local configuration, 
+    and downloads the necessary embedding models for the RAG engine.
     """
     init_db()
     
-    with console.status("Downloading necessary AI models (this may take a few minutes)...", spinner='bouncingBar'):
+    if not shutil.which("ollama"):
+        print("[bold red]Ollama is not installed![/bold red]")
+        print("Please install it from https://ollama.com before running setup.")
+        raise typer.Exit(code=1)
+    
+    output = subprocess.check_output(["ollama", "list"], text=True).strip().split('\n')
+    available_models = [line.split()[0] for line in output[1:] if line]
+
+    valid_models = [m for m in available_models if "embed" not in m]
+
+    if not valid_models:
+        print("[bold red]No text-generation models found in Ollama.[/bold red]")
+        print("Please pull a model first: 'ollama pull qwen2.5-coder'")
+        raise typer.Exit(code=1)
+    
+    if model:
+        matching_models = [m for m in available_models if model in m]
+        if not matching_models:
+            print(f"[bold red]Model '{model}' is not installed in your Ollama![/bold red]")
+            raise typer.Exit(code=1)
+        selected_model = matching_models[0]
+    else:
+        matching_defaults = [m for m in valid_models if "qwen2.5-coder" in m]
+        selected_model = matching_defaults[0] if matching_defaults else valid_models[0]
+        
+    CONFIG_DIR = os.path.expanduser("~/.shai")
+    os.makedirs(CONFIG_DIR, exist_ok=True)
+    with open(os.path.join(CONFIG_DIR, 'config.json'), 'w', encoding='utf-8') as f:
+        json.dump({'model': selected_model}, f, indent=4)
+    
+    print(f"[bold cyan]Selected Engine:[/bold cyan] {selected_model}")    
+        
+    with console.status("Downloading embedding models for RAG (this may take a few minutes)...", spinner='bouncingBar'):
         subprocess.run("ollama pull nomic-embed-text", shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         
     print("[bold green]✓ Environment successfully initialized.[/bold green]")
@@ -183,7 +229,41 @@ The user is strictly responsible for reviewing all commands before execution.
 The creator assumes no liability for any system damage or data loss."""
     
     print(Panel.fit(disclaimer, border_style="yellow", title="⚠️ WARNING"))
-   
+    
+@t.command()
+def train():
+    """
+    [bold cyan]Export[/bold cyan] telemetry data to a ChatML dataset for Fine-Tuning.
+    
+    Analyzes your local execution history (successful commands and explanations) 
+    and exports them to ~/shai/data/dataset.jsonl ready for HuggingFace.
+    """
+    export_script = os.path.expanduser("~/shai/scripts/export_dataset.py")
+    
+    if not os.path.exists(export_script):
+        print("[bold red]Export script not found![/bold red]")
+        print(f"Expected to find it at: {export_script}")
+        raise typer.Exit(code=1)
+
+    with console.status("Compiling ChatML dataset from telemetry and ground truth...", spinner='dots'):
+        result = subprocess.run([sys.executable, export_script], capture_output=True, text=True)
+        
+    if result.returncode != 0:
+        print("[bold red]Error generating dataset:[/bold red]")
+        print(result.stderr)
+        raise typer.Exit(code=1)
+        
+    json_path = os.path.expanduser("~/shai/data/dataset.jsonl")
+    
+    print(f"[bold green]✓ Dataset successfully exported to {json_path}[/bold green]")
+    print("\n[bold cyan]Next Steps for Fine-Tuning (shai-expert):[/bold cyan]")
+    print("1. Run the HuggingFace training:   [yellow]python ~/shai/scripts/train.py[/yellow]")
+    print("2. Merge the LoRA adapter:         [yellow]python ~/shai/scripts/merge.py[/yellow]")
+    print("3. Clone llama.cpp repository:     [yellow]git clone https://github.com/ggerganov/llama.cpp[/yellow]")
+    print("4. Convert to Ollama format:       [yellow]python llama.cpp/convert_hf_to_gguf.py models/shai-merged --outfile shai-expert.gguf[/yellow]")
+    print("5. Create the Ollama model:        [yellow]ollama create shai-expert -f Modelfile[/yellow] (Ensure Modelfile points to the .gguf)")
+    print("6. Update your CLI to use it:      [yellow]shai setup -m shai-expert[/yellow]")
+    
 if __name__ == "__main__":
     init_db()
     t()

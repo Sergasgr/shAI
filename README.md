@@ -11,7 +11,7 @@
 
 ## 🎥 Demo
 
-![shAI Demo](docs/render1777482232590.gif)
+![shAI Demo](docs/render.gif)
 
 ---
 
@@ -28,14 +28,25 @@
 
 This project is not just a wrapper; it includes a full Machine Learning lifecycle:
 1. **Data Collection:** `telemetry.py` logs user prompts, generated commands, and OS context into a local SQLite database.
-2. **Fine-Tuning:** Custom Python scripts to extract feedback, generate a `.jsonl` dataset, and train a **LoRA adapter** using HuggingFace `trl` and `peft`.
-> ⚙️ **Note on Quantization:** To convert trained models to GGUF format, you must clone and build [llama.cpp](https://github.com/ggerganov/llama.cpp) inside the `scripts/` directory. This dependency is excluded from the repository to keep it lightweight.
+2. **Continuous Learning Pipeline (Fine-Tuning):**
+   * **Export (ChatML):** The system extracts your successful local executions and explanations from SQLite, merging them with a ground truth dataset to generate a high-quality `dataset.jsonl` in ChatML format.
+   * **Train (LoRA):** Custom Python scripts train a parameter-efficient LoRA adapter using HuggingFace `trl` and `peft`.
+   * **Merge:** The LoRA weights are merged back into the base model (e.g., Qwen 2.5) to produce native `.safetensors`.
+   * **Convert (llama.cpp):** Utilizing `llama.cpp`, the merged model is converted into a `.gguf` file format compatible with Ollama. *(Note: You must clone and build [llama.cpp](https://github.com/ggerganov/llama.cpp) inside the `scripts/` directory for this step).*
+   * **Deploy:** A custom `Modelfile` packages the `.gguf` into your own `shai-expert` model.
 3. **Evaluation:** Automated benchmarking (`run_evals.py`) calculating exact match and latency against a ground truth dataset.
 4. **Vector Database:** LangChain and ChromaDB integration for semantic search of local documentation.
-
 ---
 
 ## 🚀 Installation & Setup
+
+### 📋 Prerequisites
+Before installing shAI, you **must** have [Ollama](https://ollama.com/) installed on your system and at least one text-generation model downloaded:
+
+```bash
+curl -fsSL https://ollama.com/install.sh | sh
+ollama pull qwen2.5-coder
+```
 
 We use `uv` for lightning-fast, isolated installation.
 
@@ -48,6 +59,8 @@ cd shai
 uv tool install .
 
 # 3. Initialize the environment (Downloads the embedding model)
+# By default, it automatically selects your installed model. 
+# You can specify a different engine using the -m flag (e.g., shai setup -m shai-expert)
 shai setup
 ```
 
@@ -55,7 +68,7 @@ shai setup
 
 ## 🕹️ Usage
 
-`shAI` provides three main commands to interact with your system: `ask`, `learn`, and `setup`.
+`shAI` provides three main commands to interact with your system: `ask`, `learn`, `setup` and `train`.
 
 ### 1. `shai ask` (Core Engine)
 Translates your natural language prompt into an executable Linux command or Bash script.
@@ -85,10 +98,17 @@ shai learn doc.txt
 ```
 
 ### 3. `shai setup` (Environment Initialization)
-Initializes the local SQLite telemetry database and pulls the required `nomic-embed-text` embedding models from Ollama for the RAG engine.
+Initializes the local SQLite telemetry database, verifies the Ollama installation, and pulls the required nomic-embed-text embedding models for the RAG engine.
 
 ```bash
 shai setup
+```
+
+### 4. `shai train` (Dataset Export)
+Analyzes your local telemetry database (feedback.db). It extracts your successful command executions (exit code 0) and explanations, crossing them with a ground_truth.json file to generate a high-quality, ChatML-formatted dataset (dataset.jsonl). This is the first step to fine-tune your own shai-expert model.
+
+```bash
+shai train
 ```
 
 ---
