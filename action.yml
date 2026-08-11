@@ -1,0 +1,33 @@
+name: 'shAI Bash Reviewer'
+description: 'Automatically reviews bash scripts for security and syntax vulnerabilities using shAI DevSecOps.'
+branding:
+  icon: 'shield'
+  color: 'blue'
+  
+inputs:
+  script_path:
+    description: 'Path to the bash script you want to analyze'
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: Set up dependencies (Shellcheck)
+      shell: bash
+      run: sudo apt-get update && sudo apt-get install -y shellcheck
+
+    - name: Install uv (Python Package Manager)
+      shell: bash
+      run: curl -LsSf https://astral.sh/uv/install.sh | sh
+
+    - name: Install shAI
+      shell: bash
+      run: |
+        export PATH="$HOME/.local/bin:$PATH"
+        uv pip install --system .
+
+    - name: Run shAI CI Review
+      shell: bash
+      run: |
+        export PATH="$HOME/.local/bin:$PATH"
+        shai ci-review ${{ inputs.script_path }}

@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  fastapi:
+    build: . # Aquí puedes usar un Dockerfile simple que instale FastAPI y uvicorn
+    ports:
+      - "8000:8000"
+    command: uvicorn controller:app --host 0.0.0.0 --port 8000
+
+  prometheus:
+    image: prom/prometheus:latest
+    ports:
+      - "9090:9090"
+    volumes:
+      # Deberás crear un archivo prometheus.yml básico que apunte a "fastapi:8000"
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3000:3000"
+    depends_on:
+      - prometheus

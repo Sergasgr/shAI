@@ -1,0 +1,29 @@
+name: Publish shAI to PyPI
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  pypi-publish:
+    name: Build and publish Python CLI to PyPI
+    runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/p/shai
+    permissions:
+      id-token: write 
+      contents: read
+
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v4
+
+      - name: Set up uv (Lightning-fast package manager)
+        uses: astral-sh/setup-uv@v3
+
+      - name: Build the Python package
+        run: uv build
+
+      - name: Publish package distributions to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1

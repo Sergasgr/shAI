@@ -1,17 +1,38 @@
 import httpx
+import typer
+from rich import print
 from shai.core.config import OLLAMA_BASE_URL, OLLAMA_MODEL
 from shai.core.rag_engine import search_knowledge
 
+def send_ollama_request(url: str, req: dict, timeout: int = 60) -> dict:
+    try:
+        response = httpx.post(url, json=req, timeout=timeout)
+        data = response.json()
+        
+        if "error" in data:
+            print(f"[bold red]Ollama Model Error:[/bold red] {data['error']}")
+            print("[yellow]Tip: Check if the configured model is installed by running 'ollama list'.[/yellow]")
+            raise typer.Exit(code=1)
+            
+        return data
+    except httpx.ConnectError:
+        print("[bold red]Network Error:[/bold red] Could not connect to Ollama. Please make sure the service is active.")
+        raise typer.Exit(code=1)
+    except httpx.ReadTimeout:
+        print("[bold red]Timeout Error:[/bold red] The AI took too long to respond (over 60 seconds). Try checking your system resources.")
+        raise typer.Exit(code=1)
+    except httpx.RequestError as e:
+        print(f"[bold red]HTTP Error:[/bold red] An unexpected error occurred: {e}")
+        raise typer.Exit(code=1)
+    
 def check_llm():
     try:
-        response = httpx.get(OLLAMA_BASE_URL, timeout=None)
-        if response.status_code == 200:
-            return True     
-        return False
+        response = httpx.get(OLLAMA_BASE_URL, timeout=3.0)
+        return response.status_code == 200
     except httpx.RequestError:
         return False 
     
-def get_command(user_input: str, context: dict) -> str:
+def get_command(user_input: str, context: dict) -> tuple[str, float, float]:
     rag_context = search_knowledge(user_input)
     instructions = f"You are a Linux Shell expert. Return ONLY the command to comply with the client's request without format neither explanations nor greetings. OS: {context['os']}. Shell: {context['shell']}."
     
@@ -29,20 +50,24 @@ def get_command(user_input: str, context: dict) -> str:
         "stream": False
     }
     
-    response = httpx.post(OLLAMA_BASE_URL+"api/chat", json=req, timeout=None)
-    data = response.json()
+    data = send_ollama_request(OLLAMA_BASE_URL+"api/chat", req)
     
-    if "error" in data:
-        return data['error']
+    total_duration_s = data.get("total_duration", 0) / 1e9
+    eval_duration_s = data.get("eval_duration", 0) / 1e9
+    eval_count = data.get("eval_count", 0)
+    
+    tps = (eval_count / eval_duration_s) if eval_duration_s > 0 else 0.0
         
     data_content = data["message"]["content"].replace("```bash", "").replace("```", "").replace("`", "")
     lines = data_content.split("\n")
     
+    final_cmd = data_content.strip()
     for line in lines:
         if len(line.strip()) > 1:
-            return line.strip()
-            
-    return data_content.strip() 
+            final_cmd = line.strip()
+            break
+        
+    return final_cmd, total_duration_s, tps
     
 def get_explanation(command: str, context: dict) -> str:
     instructions = f"You are a Linux Shell expert. Return a briefly explanation of the given command. Be concise and direct. OS: {context['os']}. Language: {context['language']}."
@@ -56,8 +81,8 @@ def get_explanation(command: str, context: dict) -> str:
         "stream": False 
     }
     
-    response = httpx.post(OLLAMA_BASE_URL+"api/chat", json=req, timeout=None)
-    data = response.json()
+    data = send_ollama_request(OLLAMA_BASE_URL+"api/chat", req)
+    
     return data["message"]["content"].replace("`","'")
 
 def get_bash_script(user_input: str, context: dict) -> str:
@@ -76,12 +101,7 @@ def get_bash_script(user_input: str, context: dict) -> str:
         "stream": False
     }
     
-    response = httpx.post(OLLAMA_BASE_URL+"api/chat", json=req, timeout=None)
-    data = response.json()
-    
-    if "error" in data:
-        return f"ERROR_OLLAMA_API: {data['error']}"
-    
+    data = send_ollama_request(OLLAMA_BASE_URL+"api/chat", req)
     content = data["message"]["content"]
     
     if "```bash" in content:
@@ -108,6 +128,5 @@ def get_script_explanation(script: str, context: dict) -> str:
         "stream": False 
     }
     
-    response = httpx.post(OLLAMA_BASE_URL+"api/chat", json=req, timeout=None)
-    data = response.json()
+    data = send_ollama_request(OLLAMA_BASE_URL+"api/chat", req)
     return data["message"]["content"].replace("`","'").replace("'''", "")
