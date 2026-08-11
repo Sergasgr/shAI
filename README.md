@@ -5,7 +5,9 @@
 ![Ollama](https://img.shields.io/badge/LLM-Ollama-white.svg)
 ![MLOps](https://img.shields.io/badge/MLOps-End--to--End-green.svg)
 
-**shAI** is a CLI tool that translates natural language into executable Linux commands and bash scripts. Built from scratch with an End-to-End MLOps pipeline, it runs **100% locally** preserving your privacy, and uses **RAG** (Retrieval-Augmented Generation) to learn your corporate documentation.
+**shAI** is a CLI tool that translates natural language into executable Linux commands and bash scripts. Powered by **Ollama** & **Qwen 2.5-Coder**, it runs 100% locally to guarantee absolute data privacy. 
+
+Beyond standard generation, shAI features an **Agentic Auto-healing** loop to autonomously fix failed commands, a **DevSecOps** layer with Docker sandboxing for safe execution, and uses **RAG** (Retrieval-Augmented Generation) to master your corporate documentation. Built from the ground up, it includes a zero-latency, **End-to-End MLOps pipeline** for on-device LoRA fine-tuning.
 
 ---
 
