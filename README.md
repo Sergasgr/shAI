@@ -60,7 +60,7 @@ ollama pull qwen2.5-coder
 curl -LsSf https://astral.sh/uv/install.sh | sh
 ```
 
-**🚀 Standard Installation (End Users)
+**🚀 Standard Installation (End Users)**
 If you just want to use shAI in your terminal:
 ```bash
 # 1. Clone the repository
@@ -76,7 +76,7 @@ uv tool install .
 shai setup
 ```
 
-**🛠️ Local Development
+**🛠️ Local Development**
 If you want to modify the code, run the security test suite, or contribute:
 ```bash
 # 1. Clone the repository

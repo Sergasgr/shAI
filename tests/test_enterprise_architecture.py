@@ -27,9 +27,11 @@ def test_cloud_telemetry_payload_structure(mock_post):
     assert payload.get("tokens_per_second") == tps, "TPS metric missing from telemetry payload."
     assert payload.get("exit_code") == exit_code, "Exit code missing from telemetry payload."
 
+@patch("shai.cli.check_llm")
 @patch("shai.cli.get_command")
 @patch("shai.cli.check_cache")
-def test_semantic_cache_hit_bypasses_llm(mock_check_cache, mock_get_command):
+def test_semantic_cache_hit_bypasses_llm(mock_check_cache, mock_get_command, mock_check_llm):
+    mock_check_llm.return_value = True
     mock_check_cache.return_value = "ls -la"
     result = runner.invoke(app, ["ask", "list files", "-y"])
     assert "ls -la" in result.stdout
