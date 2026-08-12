@@ -1,9 +1,7 @@
-import pytest
 import sqlite3
 import subprocess
 import threading
 from unittest.mock import patch, MagicMock
-from pathlib import Path
 from typer.testing import CliRunner
 from shai.cli import t as app
 from shai.core.download_llama_cpp import fetch_llama_cpp

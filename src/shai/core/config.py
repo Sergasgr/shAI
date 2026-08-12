@@ -19,25 +19,15 @@ OLLAMA_BASE_URL = os.environ.get("SHAI_OLLAMA_URL", "http://localhost:11434/")
 OLLAMA_MODEL = os.environ.get("SHAI_OLLAMA_MODEL", SHAI_OLLAMA_MODEL)
 EMBEDDINGS_MODEL = os.environ.get("EMBEDDINGS_MODEL", "nomic-embed-text")
 
-CRITICAL_PATHS = [ # Están todos los criticals independientemente del Kernel?
-    Path("/etc"),
-    Path("/boot"),
-    Path("/root"),
-    Path("/bin"),
-    Path("/sbin"),
-    Path("/usr/bin"),
-    Path("/usr/sbin"),
-    Path("/usr/local/bin"),
-    Path("/var/log"),
-    Path("/sys"),
-    Path("/proc"),
-    Path("/dev"),
-    Path("~/.ssh").expanduser(),
-    Path("~/.aws").expanduser(),
-    Path("~/.config").expanduser(),
-    Path("~/.bashrc").expanduser(),
-    Path("~/.bash_profile").expanduser(),
-    Path("~/.zshrc").expanduser(),
+CRITICAL_PATHS = [ 
+    Path("/etc"), Path("/boot"), Path("/root"), Path("/bin"),
+    Path("/sbin"), Path("/usr/bin"), Path("/usr/sbin"),
+    Path("/usr/local/bin"), Path("/var/log"), Path("/sys"),
+    Path("/proc"), Path("/dev"), 
+    Path("/System"), Path("/Library"),
+    Path("~/.ssh").expanduser(), Path("~/.aws").expanduser(),
+    Path("~/.config").expanduser(), Path("~/.bashrc").expanduser(),
+    Path("~/.bash_profile").expanduser(), Path("~/.zshrc").expanduser(),
 ]
 
 FORBIDDEN_COMMANDS = [
@@ -50,7 +40,7 @@ FORBIDDEN_COMMANDS = [
     "bash", "sh", "zsh", "tmux", "screen"
 ]
 
-# MODEL_RISK = ""
+MODEL_RISK = "llama-guard3"
 PROMPT_RISK = """
 You are a CLI safety auditor. Your job is to analyze a single terminal command and generate a one-line risk summary in English, explicitly warning the user about its side effects (file deletion, privilege escalation, network changes, or system modifications).
 
@@ -124,11 +114,13 @@ HEALING_PROMPT = """You are an expert Linux debugger and system administrator. A
 
 CLOUD_API_URL = "http://localhost:8000/api/v1/telemetry"
 
-SIMILARITY_THRESHOLD = 0.15 # Ajusta este valor según las pruebas (menor = más estricto)
+SIMILARITY_THRESHOLD = 0.25
 
 # For fine-tune the security model
 SECURITY_TOKENIZER = "distilbert-base-multilingual-cased"
-SECURITY_MODEL = ""
+SECURITY_MODEL = "distilbert-base-multilingual-cased"
+
+HF_BASE_MODEL = os.environ.get("HF_BASE_MODEL", "Qwen/Qwen2.5-Coder-7B-Instruct")
 
 MODEL = "llama-guard3"
 THRESHOLD = 0.8

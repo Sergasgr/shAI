@@ -8,6 +8,10 @@ inputs:
   script_path:
     description: 'Path to the bash script you want to analyze'
     required: true
+  severity_level:
+    description: 'Minimum severity level to fail the build (style, info, warning, error)'
+    required: false
+    default: 'error'
 
 runs:
   using: "composite"
@@ -31,3 +35,9 @@ runs:
       run: |
         export PATH="$HOME/.local/bin:$PATH"
         shai ci-review ${{ inputs.script_path }}
+
+    - name: Run shAI CI Review
+      shell: bash
+      run: |
+        export PATH="$HOME/.local/bin:$PATH"
+        shai ci-review ${{ inputs.script_path }} --level ${{ inputs.severity_level }}

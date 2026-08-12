@@ -70,7 +70,7 @@ def build_vector_db(file_path: str) -> bool:
         
         global vector_store_instance
         vector_store_instance = None
-        return True # Inyectamos los IDs únicos aquí
+        return True 
     
     except FileNotFoundError:
         return False

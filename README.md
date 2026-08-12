@@ -62,7 +62,14 @@ ollama pull qwen2.5-coder
 curl -LsSf https://astral.sh/uv/install.sh | sh
 ```
 
-**🚀 Standard Installation (End Users)**
+**3. Install Docker for Sandbox capabilities (Optional):**
+To use the `--sandbox` DevSecOps feature, ensure Docker is installed and running on your system.
+```bash
+curl -fsSL [https://get.docker.com](https://get.docker.com) -o get-docker.sh
+sudo sh get-docker.sh
+```
+
+### 🚀 Standard Installation (End Users)
 If you just want to use shAI in your terminal:
 ```bash
 # 1. Clone the repository
@@ -78,7 +85,7 @@ uv tool install .
 shai setup
 ```
 
-**🛠️ Local Development**
+### 🛠️ Local Development
 If you want to modify the code, run the security test suite, or contribute:
 ```bash
 # 1. Clone the repository
@@ -95,12 +102,12 @@ uv pip install -e .
 uv run pytest tests/
 ```
 
-**3. Install Docker for Sandbox capabilities (Optional):**
-To use the --sandbox DevSecOps feature, ensure Docker is installed and running on your system.
+### ⚙️ Environment Configuration
+For enterprise observability and the MLOps pipeline to work, shAI requires some environment variables. Copy the provided example file and fill in your details:
 ```bash
-curl -fsSL [https://get.docker.com](https://get.docker.com) -o get-docker.sh
-sudo sh get-docker.sh
+cp .env.example .env
 ```
+> Note: The `HF_TOKEN` is highly recommended during `shai train` to avoid Hugging Face API rate limits when downloading the massive base models. You can also customize the `HF_BASE_MODEL` in this file to fine-tune a different LLM instead of the default Qwen2.5.
 
 ---
 
@@ -257,6 +264,9 @@ terraform apply -auto-approve
 
 > ⚠️ **Disclaimer**
 > **shAI** generates system commands using Artificial Intelligence. The user is strictly responsible for reviewing all commands before execution. The creator assumes no liability for any system damage or data loss.
+
+> ⚠️ **Agent Mode Security Notice**
+> The `--agent` mode operates autonomously and executes commands using native shell delegation (`shell=True`) to support pipes (`|`) and redirections (`>`). While shAI explicitly restricts interactive payloads and relies on a local LLM, enabling agent mode grants the AI significant operational power over your current user space. Use it responsibly.
 
 ---
 

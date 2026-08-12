@@ -1,4 +1,3 @@
-import pytest
 from unittest.mock import patch, MagicMock
 from pathlib import Path
 from typer.testing import CliRunner
@@ -20,7 +19,7 @@ def test_cloud_telemetry_payload_structure(mock_post):
     
     assert mock_post.called, "Cloud telemetry POST request was not triggered."
     
-    call_args, call_kwargs = mock_post.call_args
+    _, call_kwargs = mock_post.call_args
     payload = call_kwargs.get("json", {})
     
     assert payload.get("llm_latency") == llm_latency, "Latency metric missing from telemetry payload."

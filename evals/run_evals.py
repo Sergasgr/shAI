@@ -7,7 +7,7 @@ from evals.evals_config import PROMPT_JUDGE, LLM_JUDGE
 from evals.prompts import EVAL_PROMPTS
 
 def evaluate_semantic_success(prompt: str, generated_command: str) -> int:
-    user_content = f'<intent>: "{prompt}"\n<generated_command>: "{generated_command}"\nResponse:'
+    user_content = f"<intent>:\n```\n{prompt}\n```\n<generated_command>:\n```\n{generated_command}\n```\nResponse:"
     req = {
         "model": LLM_JUDGE,
         "messages": [

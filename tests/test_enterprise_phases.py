@@ -1,13 +1,11 @@
 import pytest
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch
 from pathlib import Path
 from typer.testing import CliRunner
 from shai.ai.engine import check_forbidden
-from shai.ai.security_detector import is_prompt_injection
 from shai.core.config import CRITICAL_PATHS
 from evals.run_evals import evaluate_semantic_success
 from shai.ai.ollama_analyzer import get_risk_summary        
-from shai.cli import t as app
 
 runner = CliRunner()
 

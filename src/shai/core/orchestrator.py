@@ -3,9 +3,7 @@ import subprocess
 from rich import print
 from shai.core.config import AGENT_PROMPT, HEALING_PROMPT
 from shai.ai.ollama_client import send_ollama_request, OLLAMA_MODEL, OLLAMA_BASE_URL
-
-# Modo --agent (Opt-in): Ejerce de Ingeniero Autónomo. Es lento, consume recursos y es arriesgado, pero es capaz de resolver problemas complejos de múltiples pasos por ti. 
-# HACERLO MÁS SEGURO? ESTUDIAR SU COMPORTAMIENTO
+from shai.ai.engine import check_forbidden
 
 class AgentOrchestrator:
     def __init__(self, sys_context: dict, max_retries: int = 3): 
@@ -66,6 +64,10 @@ class AgentOrchestrator:
         retries = self.max_retries
         
         while retries > 0:
+            if check_forbidden(current_command):
+                print(f"[bold red]✗ Security Halt:[/bold red] The agent attempted to run a forbidden command: {current_command}")
+                return False
+            
             print(f"[cyan]Executing:[/cyan] {current_command}")
             try: 
                 result = subprocess.run(current_command, shell=True, check=True, capture_output=True, text=True, timeout=30)

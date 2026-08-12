@@ -10,7 +10,7 @@ DB_PATH.mkdir(parents=True, exist_ok=True)
 
 def init_db():
     DB_FILE.parent.mkdir(parents=True, exist_ok=True)
-    con = sqlite3.connect(str(DB_FILE))
+    con = sqlite3.connect(str(DB_FILE), timeout=15.0) 
     cur = con.cursor()
     cur.execute("""CREATE TABLE IF NOT EXISTS executions (
         id INTEGER PRIMARY KEY AUTOINCREMENT, 
@@ -24,7 +24,7 @@ def init_db():
     con.close() 
     
 def rm_db():
-    con = sqlite3.connect(str(DB_FILE))
+    con = sqlite3.connect(str(DB_FILE), timeout=15.0)
     cur = con.cursor()
     cur.execute("DELETE FROM executions;")
     cur.execute("VACUUM;")
@@ -34,7 +34,7 @@ def rm_db():
 def log_execution(prompt: str, command: str, explanation: str, os_context: str, exit_code: int):
     def run_sqlite():
         try:
-            con = sqlite3.connect(str(DB_FILE))
+            con = sqlite3.connect(str(DB_FILE), timeout=15.0)
             cur = con.cursor()
             cur.execute(
                 "INSERT INTO executions (prompt, command, explanation, os_context, exit_code) VALUES (?, ?, ?, ?, ?)", 
@@ -44,8 +44,10 @@ def log_execution(prompt: str, command: str, explanation: str, os_context: str, 
                 "DELETE FROM executions WHERE id NOT IN (SELECT id FROM executions ORDER BY id DESC LIMIT 500);"
             )
             con.commit()
-        except Exception:
+        except sqlite3.OperationalError:
             pass 
+        except Exception:
+            pass
         finally:
             if 'con' in locals():
                 con.close()

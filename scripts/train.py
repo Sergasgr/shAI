@@ -3,17 +3,18 @@ from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
 from datasets import load_dataset
 from trl import SFTTrainer
 from peft import LoraConfig
-import os 
+from pathlib import Path
+from shai.core.config import HF_BASE_MODEL
 
-dataset_path = os.path.expanduser("~/shai/data/dataset.jsonl")
-dataset = load_dataset("json", data_files=dataset_path, split="train")
-model_name = "Qwen/Qwen2.5-Coder-7B-Instruct"
-tokenizer = AutoTokenizer.from_pretrained(model_name)
+dataset_path = Path.home() / ".local" / "share" / "shai" / "dataset.jsonl"
+dataset = load_dataset("json", data_files=str(dataset_path), split="train")
+
+tokenizer = AutoTokenizer.from_pretrained(HF_BASE_MODEL)
 tokenizer.pad_token = tokenizer.eos_token
 bnb_config = BitsAndBytesConfig(load_in_4bit=True, bnb_4bit_compute_dtype=torch.float16)
 
 model = AutoModelForCausalLM.from_pretrained(
-    model_name,
+    HF_BASE_MODEL,
     quantization_config=bnb_config,
     device_map="auto" 
 )

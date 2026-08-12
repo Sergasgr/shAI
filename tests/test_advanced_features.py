@@ -2,9 +2,7 @@ import pytest
 import time
 import torch
 from unittest.mock import patch, MagicMock
-from pathlib import Path
 from typer.testing import CliRunner
-
 from shai.core.telemetry import log_cloud_telemetry
 from shai.core.telemetry import rm_db
 from shai.ai.security_detector import is_prompt_injection
@@ -34,7 +32,6 @@ def test_mlops_modular_execution(mock_export, mock_fetch):
 
 @patch("shai.core.telemetry.sqlite3.connect")
 def test_lifecycle_clean_resilience(mock_connect):
-    from shai.core.telemetry import rm_db
     rm_db()
     mock_connect.assert_called_once()
     mock_connect.return_value.cursor.return_value.execute.assert_any_call("DELETE FROM executions;")

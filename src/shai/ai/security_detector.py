@@ -1,5 +1,6 @@
 import threading
 import torch
+from rich import print
 from pathlib import Path
 from transformers import AutoModelForSequenceClassification, AutoTokenizer
 from peft import PeftModel
@@ -20,17 +21,21 @@ class SecurityEngine:
     def load(self):
         with self.lock:
             if self.model is None:
-                lora_path = Path.home() / ".local" / "share" / "shai" / "models" / "security_lora"
-                
-                self.tokenizer = AutoTokenizer.from_pretrained(SECURITY_TOKENIZER)
-                base_model = AutoModelForSequenceClassification.from_pretrained(SECURITY_MODEL, num_labels=2)
-                
-                if lora_path.exists():
-                    self.model = PeftModel.from_pretrained(base_model, str(lora_path))
-                else:
-                    self.model = base_model
+                try:
+                    lora_path = Path.home() / ".local" / "share" / "shai" / "models" / "security_lora"
                     
-                self.model.eval()
+                    self.tokenizer = AutoTokenizer.from_pretrained(SECURITY_TOKENIZER)
+                    base_model = AutoModelForSequenceClassification.from_pretrained(SECURITY_MODEL, num_labels=2)
+                    
+                    if lora_path.exists():
+                        self.model = PeftModel.from_pretrained(base_model, str(lora_path))
+                    else:
+                        self.model = base_model
+                        
+                    self.model.eval()
+                except (RuntimeError, MemoryError) as e:
+                    print(f"\n[bold red]⚠️ Security Firewall Error:[/bold red] Out of memory loading the security model. Please free up RAM to run shAI.\nDetails: {e}")
+                    raise SystemExit(1)
 
 def is_prompt_injection(text: str) -> bool:
     engine = SecurityEngine()

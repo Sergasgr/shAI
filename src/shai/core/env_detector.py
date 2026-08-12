@@ -28,7 +28,7 @@ def alias_configuration(shell_name: str) -> Path:
     print("[bold red]Error:[/bold red] Your shell is not supported for automatic alias creation.")
     raise typer.Exit(code=1) 
     
-def create_alias(command: str, alias_name: str, shell_name: str): # Modificar codigo para incluir alias_configuration
+def create_alias(command: str, alias_name: str, shell_name: str): 
     shell_path = alias_configuration(shell_name)
     content = f"alias {alias_name}='{command}'\n"
     try:

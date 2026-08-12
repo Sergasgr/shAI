@@ -74,7 +74,10 @@ def ask(
     output, or create permanent aliases.
     """ 
     
-    # Cambiar / refinar HELPS. Controlar que agent no se pueda utilizar simultaneamente con otro comando por ejemplo. Revisar eso también.
+    if agent and any([bash, save, alias, sandbox]):
+        print("[bold red]Error:[/bold red] The [cyan]--agent[/cyan] mode is an autonomous orchestrator and is mutually exclusive.")
+        print("Please do not combine [cyan]--agent[/cyan] with [yellow]--bash, --save, --alias, or --sandbox[/yellow].")
+        raise typer.Exit(code=1)
     
     final_output = ""
     expl_text = "NULL"

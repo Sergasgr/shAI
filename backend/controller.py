@@ -1,34 +1,14 @@
-from fastapi import FastAPI, Response
-from pydantic import BaseModel
-from prometheus_client import Counter, Histogram, generate_latest, CONTENT_TYPE_LATEST
+from fastapi import FastAPI, Response, Depends
+from prometheus_client import generate_latest, CONTENT_TYPE_LATEST
 import uvicorn
-
-class TelemetryPayload(BaseModel):
-    prompt: str
-    command: str
-    exit_code: int
-    os_context: str
-    llm_latency: float
-    tokens_per_second: float
+from schemas import TelemetryPayload
+from metrics import EXECUTION_COUNTER, LATENCY_HISTOGRAM, TOKENS_HISTOGRAM
+from security import get_api_key
 
 app = FastAPI(title="shAI Telemetry API")
 
-EXECUTION_COUNTER = Counter(
-    "shai_command_executions_total",
-    "Total number of command executions",
-    ["status"]
-)
-LATENCY_HISTOGRAM = Histogram(
-    "llm_latency_seconds",
-    "Latency of LLM in seconds"
-)
-TOKENS_HISTOGRAM = Histogram(
-    "llm_tokens_per_second",
-    "LLM generation speed in tokens per second"
-)
-
 @app.post("/api/v1/telemetry")
-async def receive_telemetry(data: TelemetryPayload):
+def receive_telemetry(data: TelemetryPayload, api_key: str = Depends(get_api_key)):
     status = "success" if data.exit_code == 0 else "failure"
     EXECUTION_COUNTER.labels(status=status).inc()
 
@@ -37,11 +17,11 @@ async def receive_telemetry(data: TelemetryPayload):
     if data.tokens_per_second > 0:
         TOKENS_HISTOGRAM.observe(data.tokens_per_second)
         
-    return {"status": "ok", "message": "Telemetry correctly ingested"} #await
+    return {"status": "ok", "message": "Telemetry correctly ingested"}
 
 @app.get("/metrics")
-async def get_metrics():
-    return Response(content=generate_latest(), media_type=CONTENT_TYPE_LATEST) #await
+def get_metrics():
+    return Response(content=generate_latest(), media_type=CONTENT_TYPE_LATEST)
 
 if __name__ == "__main__":
     uvicorn.run(app, port=8000, host="0.0.0.0")

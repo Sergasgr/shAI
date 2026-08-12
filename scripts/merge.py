@@ -1,14 +1,15 @@
 import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer
 from peft import PeftModel
+from shai.core.config import HF_BASE_MODEL
 
-model_name = "Qwen/Qwen2.5-Coder-7B-Instruct"
-tokenizer = AutoTokenizer.from_pretrained(model_name)
+tokenizer = AutoTokenizer.from_pretrained(HF_BASE_MODEL)
 
 model = AutoModelForCausalLM.from_pretrained(
-    model_name,
+    HF_BASE_MODEL,
     dtype=torch.float16,
-    device_map="auto" 
+    device_map="cpu",               
+    low_cpu_mem_usage=True          
 )
 
 peft_model = PeftModel.from_pretrained(model, "models/shai-bash-adapter")

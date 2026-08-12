@@ -1,4 +1,3 @@
-import pytest
 import torch
 from unittest.mock import patch, MagicMock
 from shai.ai.security_detector import is_prompt_injection
