@@ -1,9 +1,9 @@
+import uvicorn
 from fastapi import FastAPI, Response, Depends
 from prometheus_client import generate_latest, CONTENT_TYPE_LATEST
-import uvicorn
-from schemas import TelemetryPayload
-from metrics import EXECUTION_COUNTER, LATENCY_HISTOGRAM, TOKENS_HISTOGRAM
-from security import get_api_key
+from backend.schemas import TelemetryPayload
+from backend.metrics import EXECUTION_COUNTER, LATENCY_HISTOGRAM, TOKENS_HISTOGRAM
+from backend.security import get_api_key
 
 app = FastAPI(title="shAI Telemetry API")
 
