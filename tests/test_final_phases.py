@@ -78,7 +78,7 @@ def test_agent_auto_healing_loop(mock_subprocess_run, mock_fix_command):
     error_mock = subprocess.CalledProcessError(returncode=1, cmd="ls /root", stderr="Permission denied")
     success_mock = MagicMock(stdout="root_files\n")
     mock_subprocess_run.side_effect = [error_mock, success_mock]
-    mock_fix_command.return_value = "sudo ls /root"
+    mock_fix_command.return_value = "ls -la /root"
     
     success = orchestrator.execute_with_healing("List root", "ls /root")
     

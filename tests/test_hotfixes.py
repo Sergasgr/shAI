@@ -19,7 +19,7 @@ def test_telemetry_api_key_auth():
         "os_context": "Linux", "llm_latency": 1.0, "tokens_per_second": 10.0
     }
     response_unauth = client.post("/api/v1/telemetry", json=payload)
-    assert response_unauth.status_code in (403, 422), "Vulnerability: Telemetry endpoint accepted unauthenticated request."
+    assert response_unauth.status_code in (401, 403, 422), "Vulnerability: Telemetry endpoint accepted unauthenticated request."
     
     response_wrong = client.post("/api/v1/telemetry", json=payload, headers={"X-API-Key": "fake-key"})
     assert response_wrong.status_code == 403, "Vulnerability: Telemetry endpoint accepted invalid API Key."
