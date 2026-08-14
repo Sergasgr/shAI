@@ -4,7 +4,7 @@ import pytest
 from unittest.mock import patch
 from fastapi.testclient import TestClient
 from typer.testing import CliRunner
-from controller import app
+from backend.controller import app
 from shai.cli import t
 from shai.ai.security_detector import SecurityEngine
 
