@@ -36,8 +36,11 @@ FORBIDDEN_COMMANDS = [
     "shutdown", "reboot", "poweroff", "init", "telinit", "halt",
     "kill", "killall", "pkill", "xkill",
     "sudo", "su", "userdel", "groupdel", "passwd",
-    "/dev/sd", "/dev/nvme", "/dev/null", "/dev/zero",
     "bash", "sh", "zsh", "tmux", "screen"
+]
+
+FORBIDDEN_PATHS = [
+    "/dev/sd", "/dev/nvme", "/dev/null", "/dev/zero",
 ]
 
 MODEL_RISK = "llama-guard3"
@@ -121,6 +124,3 @@ SECURITY_TOKENIZER = "distilbert-base-multilingual-cased"
 SECURITY_MODEL = "distilbert-base-multilingual-cased"
 
 HF_BASE_MODEL = os.environ.get("HF_BASE_MODEL", "Qwen/Qwen2.5-Coder-7B-Instruct")
-
-MODEL = "llama-guard3"
-THRESHOLD = 0.8

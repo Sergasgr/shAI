@@ -7,7 +7,7 @@ tokenizer = AutoTokenizer.from_pretrained(HF_BASE_MODEL)
 
 model = AutoModelForCausalLM.from_pretrained(
     HF_BASE_MODEL,
-    dtype=torch.float16,
+    torch_dtype=torch.float16,
     device_map="cpu",               
     low_cpu_mem_usage=True          
 )

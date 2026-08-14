@@ -59,13 +59,9 @@ def get_command(user_input: str, context: dict) -> tuple[str, float, float]:
     tps = (eval_count / eval_duration_s) if eval_duration_s > 0 else 0.0
         
     data_content = data["message"]["content"].replace("```bash", "").replace("```", "").replace("`", "")
-    lines = data_content.split("\n")
+    lines = [line.strip() for line in data_content.split("\n") if len(line.strip()) > 1]
     
-    final_cmd = data_content.strip()
-    for line in lines:
-        if len(line.strip()) > 1:
-            final_cmd = line.strip()
-            break
+    final_cmd = lines[0] if lines else data_content.strip()
         
     return final_cmd, total_duration_s, tps
     

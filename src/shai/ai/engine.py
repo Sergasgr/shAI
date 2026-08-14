@@ -3,7 +3,7 @@ import subprocess
 from pathlib import Path
 from rich import print
 from rich.panel import Panel
-from shai.core.config import FORBIDDEN_COMMANDS, CRITICAL_PATHS
+from shai.core.config import FORBIDDEN_COMMANDS, FORBIDDEN_PATHS, CRITICAL_PATHS
 
 def run_static_analysis(command: str) -> bool:
     if not shutil.which("shellcheck"):
@@ -28,10 +28,17 @@ def run_static_analysis(command: str) -> bool:
     return True
 
 def check_forbidden(bash_content: str):
-    commands = bash_content.split()
+    segments = [s.strip() for s in bash_content.replace("|", ";").replace("&&", ";").replace("||", ";").split(";") if s.strip()]
+    
+    for segment in segments:
+        first_token = segment.split()[0] if segment.split() else ""
+        if any(first_token.startswith(cmd) for cmd in FORBIDDEN_COMMANDS):
+            return True
+    
+    tokens = bash_content.split()
     return any(
-        any(cmd.startswith(forbidden) for forbidden in FORBIDDEN_COMMANDS)
-        for cmd in commands
+        any(token.startswith(path) for path in FORBIDDEN_PATHS)
+        for token in tokens
     )
 
 def is_critical(path_str: str) -> bool: 

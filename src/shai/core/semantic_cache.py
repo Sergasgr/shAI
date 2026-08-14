@@ -7,6 +7,7 @@ from langchain_chroma import Chroma
 from langchain_ollama import OllamaEmbeddings
 
 CACHE_DIR = Path.home() / ".local" / "share" / "shai" / "cache_db"
+MAX_CACHE_SIZE = 500
 vector_store_instance = None
 lock = threading.Lock()
 
@@ -55,5 +56,13 @@ def save_to_cache(prompt: str, command: str) -> None:
                 metadatas=[{"command": command}],
                 ids=[str(uuid.uuid4())]
             )
+         
+            collection = db._collection
+            count = collection.count()
+            if count > MAX_CACHE_SIZE:
+                excess = count - MAX_CACHE_SIZE
+                results = collection.get(limit=excess)
+                if results and results["ids"]:
+                    collection.delete(ids=results["ids"])
     except Exception:
         pass

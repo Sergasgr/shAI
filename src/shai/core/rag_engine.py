@@ -10,7 +10,7 @@ from langchain_chroma import Chroma
 from langchain_classic.retrievers import EnsembleRetriever
 from langchain_community.retrievers import BM25Retriever
 from shai.core.config import OLLAMA_BASE_URL, EMBEDDINGS_MODEL
-from shai.ai.security_detector import is_prompt_injection
+
 
 DB_DIR = Path.home() / ".local" / "share" / "shai" / "shai_db"
 CHUNKS_FILE = DB_DIR / "chunks.pkl"
@@ -52,9 +52,6 @@ def build_vector_db(file_path: str) -> bool:
         )
         
         DB_DIR.mkdir(parents=True, exist_ok=True)
-        
-        if any(is_prompt_injection(str(chunk)) for chunk in chunks):
-            return False
         
         with open(CHUNKS_FILE, "wb") as f:
             pickle.dump(chunks, f)

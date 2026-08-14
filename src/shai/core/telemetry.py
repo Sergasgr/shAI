@@ -45,9 +45,10 @@ def log_execution(prompt: str, command: str, explanation: str, os_context: str, 
             )
             con.commit()
         except sqlite3.OperationalError:
-            pass 
-        except Exception:
             pass
+        except Exception as e:
+            import sys
+            print(f"[shai telemetry warning] {e}", file=sys.stderr)
         finally:
             if 'con' in locals():
                 con.close()

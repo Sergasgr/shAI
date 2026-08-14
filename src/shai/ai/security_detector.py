@@ -18,6 +18,11 @@ class SecurityEngine:
                 cls.instance.model = None
         return cls.instance
     
+    @classmethod
+    def reset(cls):
+        with cls.lock:
+            cls.instance = None
+    
     def load(self):
         with self.lock:
             if self.model is None:

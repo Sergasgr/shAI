@@ -35,9 +35,3 @@ runs:
       run: |
         export PATH="$HOME/.local/bin:$PATH"
         shai ci-review ${{ inputs.script_path }}
-
-    - name: Run shAI CI Review
-      shell: bash
-      run: |
-        export PATH="$HOME/.local/bin:$PATH"
-        shai ci-review ${{ inputs.script_path }} --level ${{ inputs.severity_level }}

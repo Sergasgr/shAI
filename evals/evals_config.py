@@ -45,7 +45,4 @@ Response:
 ---
 
 NOW EVALUATE THE FOLLOWING INPUTS:
-<intent>: "{prompt}"
-<generated_command>: "{y_hat}"
-Response:
 """

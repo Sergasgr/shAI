@@ -37,7 +37,7 @@ def fetch_llama_cpp() -> tuple[bool, str]:
         target_dir.mkdir(exist_ok=True)
 
         with tarfile.open(fileobj=io.BytesIO(asset_resp.content), mode="r:gz") as tar:
-            tar.extractall(path=target_dir)
+            tar.extractall(path=target_dir, filter="data")
 
         for file in target_dir.iterdir():
             if file.is_file():
