@@ -113,7 +113,7 @@ cp .env.example .env
 
 ## 🕹️ Usage
 
-`shAI` provides three main commands to interact with your system: `ask`, `learn`, `setup` and `train`.
+`shAI` provides the following commands:
 
 ### 1. `shai ask` (Core Engine)
 Translates your natural language prompt into an executable Linux command or Bash script.
@@ -215,7 +215,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Run shAI Security Scanner
-        uses: Sergas/shai@main 
+        uses: Sergasgr/shai@main 
         with:
           script_path: 'deploy.sh'
 ```

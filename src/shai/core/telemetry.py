@@ -6,7 +6,6 @@ from shai.core.config import CLOUD_API_URL
 
 DB_PATH = Path.home() / ".local" / "share" / "shai"
 DB_FILE = DB_PATH / "feedback.db"
-DB_PATH.mkdir(parents=True, exist_ok=True)
 
 def init_db():
     DB_FILE.parent.mkdir(parents=True, exist_ok=True)

@@ -39,12 +39,12 @@ def test_semantic_cache_hit_bypasses_llm(mock_check_cache, mock_get_command, moc
 @patch("shai.core.rag_engine.EnsembleRetriever")
 @patch("shai.core.rag_engine.get_vector_store")
 @patch("shai.core.rag_engine.CHUNKS_FILE")
-@patch("shai.core.rag_engine.pickle.load")
+@patch("shai.core.rag_engine.json.load")
 @patch("shai.core.rag_engine.BM25Retriever.from_documents")
-def test_hybrid_search_initialization(mock_bm25, mock_pickle, mock_chunks_file, mock_get_store, mock_ensemble):
+def test_hybrid_search_initialization(mock_bm25, mock_json_load, mock_chunks_file, mock_get_store, mock_ensemble):
     mock_chunks_file.exists.return_value = True
     mock_get_store.return_value = MagicMock()
-    mock_pickle.return_value = ["dummy_chunk"]
+    mock_json_load.return_value = [{"page_content": "dummy chunk", "metadata": {}}]
     from shai.core.rag_engine import search_knowledge 
     search_knowledge("test query")
     mock_ensemble.assert_called()

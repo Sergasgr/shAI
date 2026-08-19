@@ -1,14 +1,17 @@
 import sys
+import os
 from pathlib import Path
 import pytest
 from unittest.mock import patch
-from fastapi.testclient import TestClient
 from typer.testing import CliRunner
+
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "backend"))
+os.environ.setdefault("SHAI_API_KEY", "test-key-for-pytest")
+
+from fastapi.testclient import TestClient
 from backend.controller import app
 from shai.cli import t
 from shai.ai.security_detector import SecurityEngine
-
-sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "backend"))
 
 runner = CliRunner()
 client = TestClient(app)

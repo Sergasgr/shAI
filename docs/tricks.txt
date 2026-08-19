@@ -1,15 +1,19 @@
 # ==========================================
-# 📘 Internal Corporate Cheat Sheet
+# 📘 Example Corporate Cheat Sheet (Demo)
 # ==========================================
+# NOTE: This is a DEMO file showcasing how to use 'shai learn' to ingest 
+# your internal documentation into the RAG memory. Replace these examples 
+# with your own real corporate snippets before running 'shai learn docs/tricks.txt'.
 
 # Database Management
 To restart the staging database, always use exactly this command: sudo systemctl restart postgresql@staging
-To backup the production database, the command is: pg_dump -U admin db_prod > /backup/db_prod_$(date +%F).sql
+To backup the production database, the command is: pg_dump -U db_admin production_db > /backup/db_$(date +%F).sql
 
 # Docker & Deployments
 When building the frontend docker image, the command must be: docker build -t myapp-frontend:latest -f docker/frontend.Dockerfile .
-To flush the production Redis cache securely: redis-cli -h prod-redis.internal -p 6379 FLUSHALL
+To flush the staging Redis cache: redis-cli -h staging-redis -p 6379 FLUSHDB
 
 # Logs & Monitoring
-To view the latest critical errors in the Nginx gateway: tail -n 100 /var/log/nginx/gateway_error.log | grep "CRITICAL"
+To view the latest critical errors in the Nginx gateway: tail -n 100 /var/log/nginx/error.log | grep "CRITICAL"
 To check the status of the background worker: supervisorctl status worker_process
+To monitor real-time resource usage for Docker containers: docker stats --format "table {{.Name}}\t{{.CPUPerc}}\t{{.MemUsage}}"

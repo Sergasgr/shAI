@@ -1,6 +1,6 @@
 import threading
 import shutil
-import pickle 
+import json
 import hashlib
 from pathlib import Path
 from langchain_community.document_loaders import TextLoader
@@ -11,9 +11,8 @@ from langchain_classic.retrievers import EnsembleRetriever
 from langchain_community.retrievers import BM25Retriever
 from shai.core.config import OLLAMA_BASE_URL, EMBEDDINGS_MODEL
 
-
 DB_DIR = Path.home() / ".local" / "share" / "shai" / "shai_db"
-CHUNKS_FILE = DB_DIR / "chunks.pkl"
+CHUNKS_FILE = DB_DIR / "chunks.json"
 vector_store_instance = None
 lock = threading.Lock()
 
@@ -53,8 +52,10 @@ def build_vector_db(file_path: str) -> bool:
         
         DB_DIR.mkdir(parents=True, exist_ok=True)
         
-        with open(CHUNKS_FILE, "wb") as f:
-            pickle.dump(chunks, f)
+        with open(CHUNKS_FILE, "w", encoding="utf-8") as f:
+            json.dump(
+                [{"page_content": c.page_content, "metadata": c.metadata} for c in chunks], f
+            )
   
         unique_ids = [hashlib.sha256(chunk.page_content.encode('utf-8')).hexdigest() for chunk in chunks]
         
@@ -86,9 +87,12 @@ def search_knowledge(query: str) -> str:
         return ""
     
     try:
-        with open(CHUNKS_FILE, "rb") as f:
-            chunks = pickle.load(f)
-            
+        with open(CHUNKS_FILE, "r", encoding="utf-8") as f:
+            raw_chunks = json.load(f)
+        
+        from langchain_core.documents import Document
+        chunks = [Document(page_content=c["page_content"], metadata=c.get("metadata", {})) for c in raw_chunks]
+        
         bm25_retriever = BM25Retriever.from_documents(chunks)
         bm25_retriever.k = 2
         

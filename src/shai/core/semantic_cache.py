@@ -57,12 +57,11 @@ def save_to_cache(prompt: str, command: str) -> None:
                 ids=[str(uuid.uuid4())]
             )
          
-            collection = db._collection
-            count = collection.count()
+            all_data = db.get()
+            count = len(all_data["ids"])
             if count > MAX_CACHE_SIZE:
                 excess = count - MAX_CACHE_SIZE
-                results = collection.get(limit=excess)
-                if results and results["ids"]:
-                    collection.delete(ids=results["ids"])
+                ids_to_delete = all_data["ids"][:excess]
+                db.delete(ids=ids_to_delete)
     except Exception:
         pass

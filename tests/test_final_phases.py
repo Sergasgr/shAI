@@ -86,8 +86,9 @@ def test_agent_auto_healing_loop(mock_subprocess_run, mock_fix_command):
     assert mock_subprocess_run.call_count == 2, "subprocess.run should have been called exactly twice (1 failure + 1 healing attempt)."
     mock_fix_command.assert_called_once()
 
+@patch("shai.ai.engine.shutil.which", return_value="/usr/bin/shellcheck")
 @patch("shai.ai.engine.subprocess.run")
-def test_static_analysis_shellcheck(mock_subprocess_run):
+def test_static_analysis_shellcheck(mock_subprocess_run, mock_which):
     mock_subprocess_run.return_value = MagicMock(returncode=1, stdout="SC2086: Double quote to prevent globbing.")
     
     is_safe = run_static_analysis("echo $1")
