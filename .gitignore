@@ -7,6 +7,7 @@ __pycache__/
 build/
 dist/
 *.egg-info/
+.coverage
 
 # === Machine Learning Models (Heavy Files) ===
 models/
@@ -20,18 +21,27 @@ checkpoints/
 src/shai/data/feedback.db
 src/shai/data/shai_db/
 data/
-build/
 shai_db/
 .chroma/
 *.sqlite
 *.db
+*.jsonl
 
 # === Testing & Logs ===
 .pytest_cache/
 tests/.pytest_cache/
 *.log
 
-# === OS Files ===
+# === Terraform (Security/Secrets) ===
+.terraform/
+*.tfstate
+*.tfstate.backup
+*.tfvars
+*.tfvars.json
+
+# === IDE & OS Files ===
+.vscode/
+.idea/
 .DS_Store
 Thumbs.db
 
